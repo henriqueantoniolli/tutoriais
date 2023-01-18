@@ -1,0 +1,30 @@
+### Montagem de mitogenoma com GetOrganelle ###
+
+## Instalacao do GetOrganelle ##
+# Pre-requisito: miniconda
+# Instalar o GetOrganelle em um environment proprio #
+conda create -n getorganelle_env -c bioconda getorganelle
+
+# Ativar o environment #
+conda activate getorganelle_env
+
+# Instalar a biblioteca de sementes mitocondriais #
+get_organelle_config.py -a animal_mt
+## Para instalar biblioteca de outros organismos, ver referencia em:
+get_organelle_config.py -h
+
+## Feito esses passos, quando for montar os mitogenomas, pode seguir a partir daqui ##
+
+
+## Montagem do mitogenoma ##
+
+# Ativar o environment #
+conda activate getorganelle_env
+
+# Rodar o comando: #
+get_organelle_from_reads.py -1 arquivo_R1.fq.gz -2 arquivo_R2.fq.gz -o ./resultado_getorganelle -R 5 -F animal_mt -t XXX --memory-save
+
+# -t = numero de threads do processador que você quer usar (interfere na rapidez)
+# -R = numero de rounds de extensao; caso a memoria nao seja suficiente, tentar baixar este numero
+# -F = biblioteca de sementes mitocondriais; neste caso, biblioteca para mitogenomas de animais
+# -o = diretorio para onde irao os arquivos finais
