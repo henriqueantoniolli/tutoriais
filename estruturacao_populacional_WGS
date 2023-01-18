@@ -26,7 +26,7 @@ samtools view -bt genoma_referencia.fasta -o XX.bam XX.sam
 samtools sort -o XX.sort.bam XX.bam
 
 ## Remover duplicados
-picard MarkDuplicates --ASSUME_SORTED=true --VALIDATION_STRINGENCY=SILENT --INPUT=XX.sort.bam --OUTPUT=XX.rmdup.bam --METRICS_FILE=XX.sort.rmdup.bam.metrics >& XX.rmdup.bam.MarkDuplicates.log 
+picard MarkDuplicates --ASSUME_SORTED true --VALIDATION_STRINGENCY SILENT --INPUT XX.sort.bam --OUTPUT XX.rmdup.bam --METRICS_FILE XX.sort.rmdup.bam.metrics >& XX.rmdup.bam.MarkDuplicates.log 
 
 ## Juntar todos arquivos rmdup.bam e o genoma de referencia na mesma pasta
 ## Indexar a referencia
