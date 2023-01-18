@@ -1,0 +1,47 @@
+### Estruturacao populacional por PCA com WGS ###
+## Parte 1: Mapeamento de reads
+
+## Requisitos:
+## BWA
+conda install -c bioconda bwa
+## samtools
+conda install -c bioconda samtools
+## picard
+conda install -c bioconda picard
+## freebayes
+conda install -c bioconda freebayes
+## vcffilter
+conda install -c bioconda biopet-vcffilter
+## plink
+conda install -c bioconda plink
+
+## Mapear reads no genoma de referencia
+# XX = nome da amostra (ate tres letras)
+bwa mem -t 8 -R '@RG\tID:XX\tSM:XX\tPL:Illumina' genoma_referencia.fasta readsR1.fq.gz readsR2.fq.gz 2> XX.bwamem.log > XX.sam
+
+## Converter sam para bam
+samtools view -bt genoma_referencia.fasta -o XX.bam XX.sam
+
+## Sort
+samtools sort -o XX.sort.bam XX.bam
+
+## Remover duplicados
+picard MarkDuplicates --ASSUME_SORTED=true --VALIDATION_STRINGENCY=SILENT --INPUT=XX.sort.bam --OUTPUT=XX.rmdup.bam --METRICS_FILE=XX.sort.rmdup.bam.metrics >& XX.rmdup.bam.MarkDuplicates.log 
+
+## Juntar todos arquivos rmdup.bam e o genoma de referencia na mesma pasta
+## Indexar a referencia
+samtools faidx genoma_referencia.fasta
+
+## Criar o arquivo list
+ls *.rmdup.bam > bams.list
+
+## Analisar os SNPs
+# Y = ploidia do genoma (1 para haploide; 2 para diploide; ...)
+# ZZZ = nome da amostra
+freebayes -f genoma_referencia.fasta --ploidy Y --bam-list bams.list > ZZZ.vcf
+
+## Filtar SNPs com qualidade menor que Q20
+vcffilter -f "QUAL > 20 & SAF > 5 & SAR > 5" ZZZ_filtrado.vcf
+
+## Gerar os valores da PCA
+plink --bfile ZZZ_filtrado --pca --chr-set 1 no-xy
