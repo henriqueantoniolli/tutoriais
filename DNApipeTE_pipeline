@@ -1,0 +1,22 @@
+### DNApipeTE
+
+## Requisitos: Docker
+
+## Para instalar Docker no Ubuntu 22, siga o tutorial: https://cloudcone.com/docs/article/how-to-install-docker-on-ubuntu-22-04-20-04/
+
+
+## 1. Instalar via Docker
+sudo docker pull clemgoub/dnapipete:latest
+
+## 2. Va para a pasta com o arquivo fastq.gz (single-end ou apenas reads forward) e a biblioteca do RepeatMasker, e rode o comando:
+sudo docker run -it -v /home/labdros/Documents/AVES/SLE-M/dnapipete:/mnt clemgoub/dnapipete:latest
+## OBS: nesse caso, a pasta se chama "dnapipete" e deve ser informado o caminho completo!
+
+
+## 3. Run the command:
+python3 dnaPipeTE.py -input /mnt/SLEM_R1.fastq.gz -output /mnt/output -RM_lib /mnt/RepeatMasker.lib -sample_size 3500000 -sample_number 2 -RM_t 0.2 -cpu 14
+
+
+## Dicas:
+## 1. -sample_size: deve ser numero maximo de reads dividido por 2 (nesse caso, serao feitas duas corridas no Trinity pois -sample_number 2)
+## 2. Se for rodar varias amostras, cria uma pasta bem proxima da raiz para a biblioteca do RepeatMasker e especifica no item 3.
