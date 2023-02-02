@@ -9,7 +9,7 @@
 sudo docker pull clemgoub/dnapipete:latest
 
 ## 2. Va para a pasta com o arquivo fastq.gz (single-end ou apenas reads forward) e a biblioteca do RepeatMasker, e rode o comando:
-sudo docker run -it -v /home/labdros/Documents/AVES/SLE-M/dnapipete:/mnt clemgoub/dnapipete:latest
+sudo docker run -it -v /home/usuario/Documents/AVES/SLE-M/dnapipete:/mnt clemgoub/dnapipete:latest
 ## OBS: nesse caso, a pasta se chama "dnapipete" e deve ser informado o caminho completo!
 
 
