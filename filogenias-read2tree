@@ -1,0 +1,47 @@
+Neste tutorial, usaremos a pipeline read2tree para obter uma árvore filogenética diretamente de reads - sem precisar montar o genoma.
+
+1) Com os reads brutos, use o fastp para remover os adaptadores e filtrar a qualidade do sequenciamento.
+  Não esqueça de fazer isso também com os outgroups!
+
+  Paired-end:
+  fastp -i forward.fastq.gz -I reverse.fastq.gz -o forward.R1.fastq.gz -O reverse.R2.fastq.gz -l 100 -n 0
+
+  Single-end:
+  fastp -i reads.fastq.gz -o reads.clean.fastq.gz -l 100 -n 0
+
+2) Baixe um set de marcadores ortólogos no OMA Browser: https://omabrowser.org/oma/export_markers
+  Para isso, procure duas espécies filogeneticamente próximas à(s) espécie(s) a ser(em) analisada(s) e clique em cima do nome delas.
+  Selecione "select species". Elas irão aparecer no box à direita.
+  Configure "minimum fraction of covered species" para 1.
+  Configure o número de marcadores desejados em "maximum nr of markers".
+  Clique em "submit".
+  Uma nova página vai abrir, e os genes serão carregados. Quando o download estiver disponível, aparecerá um link para baixá-los.
+  Extraia o arquivo baixado.
+  Crie uma pasta "marker_genes" e coloque os arquivos *.fna e *.fa.
+
+3) Rode os scripts do read2tree.
+  É possível ajustar o número de threads com a flag "--threads".
+  Primeiro, crie a pasta referência (nesse caso, a pasta se chamará "output" e todos os resultados serão enviados para ela).
+  read2tree --standalone_path marker_genes/ --output_path output --reference
+
+  Agora, rode cada uma das espécies separadamente.
+  read2tree --standalone_path marker_genes/ --output_path output --reads species1_R1.fastq species2_R2.fastq
+  read2tree --standalone_path marker_genes/ --output_path output --reads species2_R1.fastq species2_R2.fastq
+  read2tree --standalone_path marker_genes/ --output_path output --reads species3_R1.fastq species3_R2.fastq
+  ...
+  Não esqueça os outgroups!
+
+  Por último, crie o alinhamento concatenado.
+  read2tree --standalone_path marker_genes/ --output_path output --merge_all_mappings
+
+  Serão gerados dois arquivos finais: "concat_merge_dna.phy" e "concat_merge_aa.phy"; o primeiro é o alinhamento de nucleotídeos, enquando o segundo é o alinhamento de aminoácidos.
+  Neles também estarão incluídas as sequências utilizadas para busca de ortólogos. Remova estas sequências.
+  Ex.: Se você usou os marcadores do OMA Browser de Drosophila melanogaster e Drosophila simulans, nos arquivos finais eles aparecerão como DROME e DROSI, respectivamente.
+  Somente deixe-as no alinhamento se você for utilizá-las como outgroup.
+
+4) Reconstrução da árvore filogenética por máxima verossimilhança utilizando IQ-TREE.
+
+  Neste exemplo vamos pedir para o IQ-TREE automaticamente selecionar o melhor modelo evolutivo (flag "-m") e que o suporte de ramos seja estimado com 1000 réplicas de ultrafast bootstrap (flag "-B").
+  iqtree -s {alinhamento} -m TEST -B 1000
+
+5) Visualize a árvore abrindo o arquivo *.contree no FigTree e enraize com o outgroup mais externo (a árvore gerada pelo IQ-TREE não é enraizada).
